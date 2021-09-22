@@ -1,12 +1,7 @@
-import java.sql.Array;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
 public class PathToCords {
     private static int currentPoly = 0;
     private static int frames;
-    private static int currentFrame = 0;
     private static double currentXPos = 0;
     private static double currentYPos = 0;
     private double totalpace = 100;
@@ -82,7 +77,7 @@ public class PathToCords {
                 ArrayList<Double> values = new ArrayList<>();
                 ArrayList<String> parts = new ArrayList<>();
                 for (int j = 0; j < partSizes.get(currentNumber); j++) {
-                    parts.add(pathArray.get(sizeSum+j));
+                    parts.add(pathArray.get(sizeSum+j+1));
                 }
                 sizeSum = sizeSum+partSizes.get(currentNumber)+1;
                 currentNumber++;
@@ -265,7 +260,7 @@ public class PathToCords {
                 ArrayList<Double> values = new ArrayList<>();
                 ArrayList<String> parts = new ArrayList<>();
                 for (int j = 0; j < partSizes.get(currentNumber); j++) {
-                    parts.add(pathArray.get(sizeSum+j));
+                    parts.add(pathArray.get(sizeSum+j+1));
                 }
                 sizeSum = sizeSum+partSizes.get(currentNumber)+1;
                 currentNumber++;
@@ -278,7 +273,7 @@ public class PathToCords {
                 ArrayList<Double> values = new ArrayList<>();
                 ArrayList<String> parts = new ArrayList<>();
                 for (int j = 0; j < partSizes.get(currentNumber); j++) {
-                    parts.add(pathArray.get(sizeSum+j));
+                    parts.add(pathArray.get(sizeSum+j+1));
                 }
                 sizeSum = sizeSum+partSizes.get(currentNumber)+1;
                 currentNumber++;
@@ -297,10 +292,9 @@ public class PathToCords {
             coordsFinal[1][j] = coords.get(j*2+1);
         }
         dimensions = dimCalc(coordsFinal[0],coordsFinal[1]);
-
         for (int i = 0; i < coordsFinal[0].length; i++) {
             coordsFinal[0][i] = ((coordsFinal[0][i]-dimensions[0])/(dimensions[4]));
-            coordsFinal[1][i] = (1-(coordsFinal[1][i]-dimensions[2])/(dimensions[4]));
+            coordsFinal[1][i] = ((coordsFinal[1][i]-dimensions[2])/(dimensions[4]));
         }
         int localInterval = (int) Image.interval;
         double[][] coordsFinalReturn = new double[localInterval][2];
@@ -415,7 +409,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         currentYPos = targetY;
         if (values.size()>currentPoly+2){
@@ -446,7 +439,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         if (values.size() > currentPoly+1){
             currentPoly++;
@@ -477,7 +469,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentYPos = targetY;
         if (values.size() > currentPoly+1){
             currentPoly++;
@@ -547,7 +538,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         currentYPos = targetY;
         if (values.size()>currentPoly+6){
@@ -616,7 +606,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         currentYPos = targetY;
         lastControlX = control2X;
@@ -670,7 +659,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         currentYPos = targetY;
         if (values.size()>currentPoly+4){
@@ -720,7 +708,6 @@ public class PathToCords {
             coords.add(partCoords[i][0]);
             coords.add(partCoords[i][1]);
         }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         currentYPos = targetY;
         lastControlX = controlX;
@@ -740,6 +727,14 @@ public class PathToCords {
             line.add(values.get(currentPoly+6));
             lLine(lowerCase, line);
         }
+        boolean large = false;
+        boolean sweep = false;
+        if (values.get(currentPoly+3)==1){
+            large = true;
+        }
+        if (values.get(currentPoly+4)==1){
+            sweep = true;
+        }
         double targetX;
         double targetY;
 
@@ -752,28 +747,24 @@ public class PathToCords {
             targetY = values.get(currentPoly+6);
         }
         int realPartFrames = (int) (frames*Math.sqrt(Math.pow(targetX-currentXPos,2)+Math.pow(targetY-currentYPos,2))/totalpace);
-        double[][] partCoords = new double[realPartFrames][2];
+        double[][] rawData;
 
-        //   ArcToCords yoink = new ArcToCords()
-
+        ArcToCords yoink = new ArcToCords();
+         rawData = yoink.calcInfo(values.get(currentPoly),values.get(currentPoly+1),values.get(currentPoly+2),large,sweep,targetX,targetY,currentXPos,currentYPos);
         for (int i = 0; i < realPartFrames; i++) {
-
+            coords.add(rawData[i* ArcToCords.arcinterval/realPartFrames][0]);
+            coords.add(rawData[i* ArcToCords.arcinterval/realPartFrames][1]);
         }
-        for (int i = 0; i < (realPartFrames); i++) {
-            coords.add(partCoords[i][0]);
-            coords.add(partCoords[i][1]);
-        }
-        currentFrame+=realPartFrames;
         currentXPos = targetX;
         currentYPos = targetY;
-    }
-
-    public static void main(String[] args) {
-        PathToCords haha = new PathToCords(1000);
-
-  /*       for (int i = 0; i < yo.length; i++) {
-
-        } */
+        if (values.size()>currentPoly+7){
+            currentPoly+=7;
+            arc(lowerCase,values);
+        }
+        else {
+            currentPoly = 0;
+        }
     }
 
 }
+
