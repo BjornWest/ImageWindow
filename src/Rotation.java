@@ -1,5 +1,3 @@
-import java.util.Arrays;
-
 public class Rotation {
     public Rotation(){
     }
@@ -27,7 +25,6 @@ public class Rotation {
             if (xDistance>0){
                 double v = Math.atan(yDistance/xDistance);
                 double r = v+rotation;
-
             newcoords[0] = xAxis + Math.cos(r)*distance;
             newcoords[1] = yAxis + Math.sin(r)*distance;
             }
@@ -59,34 +56,5 @@ public class Rotation {
         return newcoords;
 
     }
-    public double[][] allPoints(double[] radii, double[] angles, double xAxis, double yAxis, double time){
-        double[][] points = new double[radii.length+1][2];
-        int n = 0;
-        double xPosition = xAxis;
-        double yPosition = yAxis;
-        int nRotate;
-
-        for (int i = 0; i <radii.length+1; i++) {
-            for (i = 0; i <n; i++){
-                if ((n)%2==1){
-                    nRotate=(n+1)/2;
-                }
-                else {
-                    nRotate=-n/2;
-                }
-                double angleTot;
-                xPosition = xPosition+radii[n-1]*Math.cos(angles[n-1]+nRotate*time*Math.PI*2);
-                yPosition = yPosition+radii[n-1]*Math.sin(angles[n-1]+nRotate*time*Math.PI*2);
-            }
-
-            points[n][0] = xPosition;
-            points[n][1] = yPosition;
-            n++;
-        }
-
-
-
-        return points;
-    }
-
 }
+
