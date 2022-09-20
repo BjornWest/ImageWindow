@@ -8,6 +8,8 @@ import java.util.*;
  */
 
 public class CoordsSave{
+    public static  boolean invert = false;
+    public static boolean mirror = false;
     public static void main(String[] args) throws InterruptedException {
         ImageWindow image = new ImageWindow();
         Pixel[][] pixels = image.getPixels();
@@ -15,12 +17,15 @@ public class CoordsSave{
         Generate generate = new Generate();
         Image.interval = 2000;
 
-        double circles = 2;
+        double circles = 1000;
+        boolean fade = true;
+        int[] circleGrowth ={5,10,50,150,300,1000};
 
+        for (int z = 0; z <circleGrowth.length; z++) {
+                //circles = circleGrowth[z];
 
-        for (int z = 0; z <10; z++) {
-            double k = 300;
-            circles+=2;
+            double k = 3000;
+            circles+=0;
             System.out.println("circles: " + circles);
             double[][] both;
             both = generate.radAng((int) circles);
@@ -58,31 +63,37 @@ public class CoordsSave{
             }
             ArrayList<Integer> pixelEdit = new ArrayList<>();
             for (int i = 0; i < 1; i++) {
-
                 for (int j = 0; j < k; j++) {
                     for (int x = (int)(coords[j][0]-finalRadius); x <  (int)(coords[j][0]+finalRadius); x++) {
                         for (int y =(int)(coords[j][1]-finalRadius); y < (int)(coords[j][1]+finalRadius); y++) {
                             if ((Math.pow(coords[j][0] - x, 2) + Math.pow(coords[j][1] - y, 2) < Math.pow(finalRadius, 2)  && ImageWindow.WIDTH > x && x > 0 && y > 0 && y < ImageWindow.HEIGHT)) {
                                   pixels[x][y].setRGB(0, 0, 255);
-                                if (i >= 0) {
-                                    pixelEdit.add(x);
-                                    pixelEdit.add(y);
+                                  if (i<1){
+                                      boolean duplicate = false;
+                                      for (int l = 0; l < pixelEdit.size(); l+=2) {
+                                          if (x == pixelEdit.get(l) && y == pixelEdit.get(l+1)){
+                                              duplicate = true;
+                                          }
+                                      }
+                                      if (!duplicate){
+                                          pixelEdit.add(x);
+                                          pixelEdit.add(y);
+                                      }
+                                  }
 
-                                }
+
                             }
                         }
                     }
-                    ArrayList<Integer> pixelDelete = new ArrayList<Integer>();
+                    ArrayList<Integer> pixelDelete = new ArrayList<>();
 
                     for (int m = 0; m < circles; m++) {
                         for (int x = (int) (vectorCoords[j][m][0][0]-both[0][m])-1; x < (int) (vectorCoords[j][m][0][0]+both[0][m]+1); x++) {
                             for (int y = (int) (vectorCoords[j][m][0][1]-both[0][m])-1; y < (int) (vectorCoords[j][m][0][1]+both[0][m]+1); y++) {
                                 if (Math.sqrt(Math.pow(vectorCoords[j][m][0][0]-x,2)+Math.pow(vectorCoords[j][m][0][1]-y,2))>both[0][m]-1 && Math.sqrt(Math.pow(vectorCoords[j][m][0][0]-x,2)+Math.pow(vectorCoords[j][m][0][1]-y,2)) <both[0][m] &&ImageWindow.WIDTH > x && x > 0 && y > 0 && y < ImageWindow.HEIGHT ){
                                     pixels[x][y].setRGB(0, 50, pixels[x][y].getB());
-                                    if (i>=0){
-                                        pixelDelete.add(x);
-                                        pixelDelete.add(y);
-                                    }
+                                    pixelDelete.add(x);
+                                    pixelDelete.add(y);
                                 }
 
                             }
@@ -92,10 +103,8 @@ public class CoordsSave{
                                 for (int y = (int)(vectorCoords[j][m][l][1] - 1); y <(int)(vectorCoords[j][m][l][1] + 1) ; y++) {
                                     if (Math.pow(vectorCoords[j][m][l][0] - x, 2) + Math.pow(vectorCoords[j][m][l][1] - y, 2) < Math.pow(vectorRadius, 2)  && ImageWindow.WIDTH > x && x > 0 && y > 0 && y < ImageWindow.HEIGHT){
                                           pixels[x][y].setRGB(155, 0, pixels[x][y].getB());
-                                          if (i>=0){
-                                              pixelDelete.add(x);
-                                              pixelDelete.add(y);
-                                          }
+                                        pixelDelete.add(x);
+                                        pixelDelete.add(y);
 
                                     }
                                 }
@@ -108,14 +117,14 @@ public class CoordsSave{
                         pixels[pixelDelete.get(l)][pixelDelete.get(l+1)].setRGB(0, 0, pixels[pixelDelete.get(l)][pixelDelete.get(l+1)].getB());
 
                     }
-                    for (int l = 0; l < pixelEdit.size(); l+=2) {
-                        if (j%((5))==0){
-                            pixels[pixelEdit.get(l)][pixelEdit.get(l+1)].setRGB(0, 0, pixels[pixelEdit.get(l)][pixelEdit.get(l+1)].getB()-1);
+                    if (fade && j%((int)(k/200))==0){
+                        for (int l = 0; l < pixelEdit.size(); l+=2) {
+                                pixels[pixelEdit.get(l)][pixelEdit.get(l+1)].setRGB(0, 0, pixels[pixelEdit.get(l)][pixelEdit.get(l+1)].getB()-1);
+
                         }
-
                     }
-                }
 
+                }
                 for (int x = 0; x < image.WIDTH; x++) {
                     for (int y = 0; y < image.HEIGHT; y++) {
                         pixels[x][y].setRGB(0, 0, 0);
@@ -127,4 +136,3 @@ public class CoordsSave{
 
     }
 }
-
